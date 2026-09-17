@@ -22,7 +22,7 @@ module tt_um_example (
   assign uio_out = 0;
   assign uio_oe = 0;
 
-  clkdiv #(.ACCW(8)) clkdiv (.clk(clk), .rst_n(rst_n), .b(ui_in), .c(uio_in), .q(clkout));
+  clkdiv2 #(.ACCW(8)) clkdiv (.clk(clk), .rst_n(rst_n), .num(ui_in), .denom(uio_in), .q(clkout));
 
   wire _unused = &{ena, 1'b0};
 
