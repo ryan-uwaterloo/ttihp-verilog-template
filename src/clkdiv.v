@@ -1,6 +1,6 @@
 `default_nettype none
 // Fractional Clock Divider
-// fclk/fq = 2(b+c)/c
+// fq/fclk = c/2(b+c)
 // important: 
 //     b AND c must both be > 0
 //     b >= c for correct behavior

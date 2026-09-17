@@ -23,18 +23,35 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    dut._log.info("Test project behavior")
+    dut._log.info("Test clock divider")
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    tests = [(2,1),
+             (3,2),
+             (8,2),
+             (67,5),
+             (101,100),
+             ]
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    for test in tests:
+        dut.ui_in.value = test[0]
+        dut.uio_in.value = test[1]
+        # Wait for one clock cycle to apply values
+        await ClockCycles(dut.clk, 1)
+        cur = 0
+        prev = 0
+        edges = 0
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+        # sample generated clock
+        for _ in range (10000):
+            await ClockCycles(dut.clk, 1)
+            cur = dut.uo_out.value
+            if cur != prev:
+                edges += 1
+            prev = cur
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+        expected = test[1]/(2*(test[0] + test[1]))
+        div_ratio = edges/(10000 * 2) # 2 edges in a clock period
+
+        assert (expected * 0.99 < div_ratio < expected * 1.01), f"In test {test} expected a ratio of {expected}, got {div_ratio} instead"
+
+    dut._log.info("Clock divider test completed successfully")
