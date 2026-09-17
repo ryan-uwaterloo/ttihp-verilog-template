@@ -5,6 +5,7 @@
 //     b AND c must both be > 0
 //     b >= c for correct behavior
 //     b + c <= 127
+// 8-bit gds : 118 cells
 module clkdiv #(
     parameter integer ACCW = 8
     ) (

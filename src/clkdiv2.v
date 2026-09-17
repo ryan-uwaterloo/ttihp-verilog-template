@@ -1,4 +1,5 @@
 `default_nettype none
+// 8-bit gds: 140 cells
 module clkdiv2 #(
     parameter integer ACCW = 8
 ) (
