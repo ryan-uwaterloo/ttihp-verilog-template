@@ -16,12 +16,30 @@ module tt_um_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+  wire clkq_posedge;
+  wire en_shreg;
+  wire [1:0] shreg_req;
+  wire shreg_data_in;
+  wire [15:0] shreg_out;
+  wire shreg_out_valid;
+  wire [3:0] shreg_status;
+  
+  assign clkq_posedge = !ui_in[2] && ui_in[1];
+  assign en_shreg = ui_in[0]; // gate this later to be enable shifting of shreg
+  assign shreg_req = ui_in[4:3];
+  assign shreg_data_in = ui_in[5];
+  assign uo_out = shreg_out[15:8] ^ shreg_out [7:0];
+  assign uio_out[0] = shreg_out_valid;
+  assign uio_out[4:1] = shreg_status;
+  assign uio_out[7:5] = '0;
+
+  shiftreg_4x1B in_tx (.clk(clk), .rst_n(rst_n), .clkq_posedge(clkq_posedge), 
+      .data_in(shreg_data_in), .en_in(en_shreg), .req(shreg_req), 
+      .data_out(shreg_out), .data_out_valid(shreg_out_valid), .full_shregs(shreg_status));
+
+  assign uio_oe  = 8'hff;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+  wire _unused = &{ena, 1'b0};
 
 endmodule

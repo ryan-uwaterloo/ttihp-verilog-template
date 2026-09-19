@@ -4,7 +4,14 @@
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
+import random
 
+async def send_byte(dut, byte):
+    for i in range(8):
+        dut.ui_in.value = 0x03 | (((byte & (1<<(7-i))) >> (7-i)) << 5)
+        await ClockCycles(dut.clk, 1)
+    dut.ui_in.value = 0x0
+    await ClockCycles(dut.clk, 1)
 
 @cocotb.test()
 async def test_project(dut):
@@ -25,16 +32,16 @@ async def test_project(dut):
 
     dut._log.info("Test project behavior")
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    rand_seed = 421
 
-    # Wait for one clock cycle to see the output values
+    await send_byte(dut, 0xEC)
+
+    assert dut.uio_out.value == 0x02, f"expected uio_out of 0x02, got {dut.uio_out.value} instead!"
+
     await ClockCycles(dut.clk, 1)
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+    dut.ui_in.value = 0x08
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+    await ClockCycles(dut.clk, 2)
+
+    assert dut.uo_out.value == 0xEC, f"expected uo_out of 0xEC, got {dut.uo_out.value} instead!"
