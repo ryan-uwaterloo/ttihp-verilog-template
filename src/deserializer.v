@@ -42,7 +42,7 @@ always @(posedge clk) begin
         valid <= 0;
     end else if (posedge_sclk && !n_cs_cdc[CDC_LEN-1]) begin
         valid <= data_shreg[7]; // when we shift out indicator, result is a valid byte
-        data_shreg <= {data_shreg[7:0], copi_cdc[CDC_LEN-1]};
+        data_shreg <= {data_shreg[6:0], copi_cdc[CDC_LEN-1]};
     end else if (n_cs_cdc[CDC_LEN-1] | valid) begin // if N_CS goes high, reset
         valid <= 0;
         data_shreg <= 8'd1;
