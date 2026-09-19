@@ -9,13 +9,12 @@ module core_data_buffer #(
     input wire [7:0] write_data,
     input wire [1:0] read_req, // read_req[0] == valid, [1] == size (0 = 8b, 1 = 16b)
 
-    output reg [3:0] full_entries, // choose a more explicit full notification :)
+    output reg [DEPTH-1:0] full_entries, // choose a more explicit full notification :)
     output reg read_data_valid,
     output reg [15:0] read_data
 );
 
-    reg [7:0] fifo [3:0];
-    reg [3:0] in_selectOH; //OH encoded
+    reg [7:0] fifo [DEPTH-1:0];
     reg [1:0] in_select;
     reg [1:0] out_select; //UInt encoded
 
@@ -26,9 +25,6 @@ module core_data_buffer #(
     reg valid_2_wide;
 
     always @(*) begin
-        // UInto to OH
-        in_selectOH = 4'h01 << in_select;
-
         // out_select intermediates
         out_sel_plus_1 = out_select + 1;
         out_sel_plus_2 = out_select + 2;
