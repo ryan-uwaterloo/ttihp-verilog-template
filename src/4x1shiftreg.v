@@ -30,13 +30,14 @@ module shiftreg_4x1B (
         end
 
         // OH to UInt for in_selectOH
-        case (in_selectOH)
-            4'b0001: in_select = 2'h0;
-            4'b0010: in_select = 2'h1;
-            4'b0100: in_select = 2'h2;
-            4'b1000: in_select = 2'h3; 
-            default: in_select = 2'h0;
-        endcase 
+        // case (in_selectOH)
+        //     4'b0001: in_select = 2'h0;
+        //     4'b0010: in_select = 2'h1;
+        //     4'b0100: in_select = 2'h2;
+        //     4'b1000: in_select = 2'h3; 
+        //     default: in_select = 2'h0;
+        // endcase 
+        in_selectOH = 4'h01 << in_select;
 
         // out_select intermediates
         out_sel_plus_1 = out_select + 1;
@@ -49,13 +50,13 @@ module shiftreg_4x1B (
 
     always @(posedge clk) begin
         if(!rst_n)begin
-            in_selectOH <= 4'h1;
+            in_select <= 2'h0;
             out_select <= 2'h0;
             data_out <= 16'h0;
             data_out_valid <= 1'b0; //todo the shift register is backwards lol
         end else begin
             if (array[in_select][7] && clkq_posedge && en_in && !(|(full_shregs & in_selectOH))) begin // on last shift for a shreg
-                in_selectOH <= {in_selectOH[2:0], in_selectOH[3]};
+                in_select <= in_select + 1;
             end
             if (valid_1_wide) begin // if the shreg we're pointing to is full and we're reading only 1
                 data_out_valid <= 1'b1;
